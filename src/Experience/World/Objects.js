@@ -132,9 +132,9 @@ export default class Objects
 
         // Les paramètres doivent matcher exactement ceux que tu as mis dans Beam.js pour setMode()
         if (this.mode === 1) {
-            this.group.rotation.set(0, 0, 0)
-            this.p.startDiameter = 0.1
-            this.p.endDiameter = 30.0
+            this.group.rotation.set(0, Math.PI, 0)
+            this.p.startDiameter = 30.0
+            this.p.endDiameter = 0.1
             this.p.curvature = -4.0
             this.changeColorMode("fire")
         } 

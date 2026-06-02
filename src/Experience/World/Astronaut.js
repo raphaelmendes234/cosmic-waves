@@ -49,8 +49,8 @@ export default class Astronaut
     setModel()
     {
         this.model = this.ressource.scene
-        this.model.position.set(0, -5, 0)
-        this.model.scale.set(2, 2, 2)
+        // this.model.position.set(0, -5, 0)
+        // this.model.scale.set(1.5, 1.5, 1.5)
         this.scene.add(this.model)
 
         this.model.traverse((child) => 
@@ -144,6 +144,25 @@ export default class Astronaut
                     }
                 })
             })
+    }
+
+    setMode(modeNumber)
+    {
+        if (!this.model && !this.model.visible) return
+        
+        this.mode = modeNumber
+
+        if (this.mode === 1) {
+            this.model.scale.set(1.75,1.75,1.75)
+            this.model.position.set(0, -6, 0)
+        } 
+        else if (this.mode === 2) {
+            this.model.scale.set(2,2,2)
+            this.model.position.set(-2, -7, 1)
+        } 
+        else if (this.mode === 3) {
+           console.log("astronaut on scene 3")
+        }
     }
 
     show()

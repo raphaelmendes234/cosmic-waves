@@ -39,7 +39,10 @@ export default class Manager
         switch(sceneNumber)
         {
             case 1:
-                if(astronaut) astronaut.show()
+                if(astronaut) { 
+                    astronaut.show() 
+                    astronaut.setMode(1)
+                }
                 if(helmet) helmet.show()
                 if(eye) eye.hide()
                 if(beam) beam.setMode(1)
@@ -49,7 +52,10 @@ export default class Manager
                 break
 
             case 2:
-                if(astronaut) astronaut.show()
+                if(astronaut) { 
+                    astronaut.show() 
+                    astronaut.setMode(2)
+                }
                 if(helmet) helmet.show()
                 if(eye) eye.hide()
                 if(beam) beam.setMode(2)

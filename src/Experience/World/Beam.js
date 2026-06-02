@@ -260,11 +260,11 @@ export default class Beam
 
         if (this.mode === 1) {
             // group rota
-            this.group.rotation.set(0, 0, 0)
+            this.group.rotation.set(0, Math.PI, 0)
 
             // beams params
-            this.p.startDiameter = 0.1
-            this.p.endDiameter = 30.0
+            this.p.startDiameter = 30.0
+            this.p.endDiameter = 0.1
             this.p.curvature = -4.0
             this.changeColorMode("fire")
         } 
