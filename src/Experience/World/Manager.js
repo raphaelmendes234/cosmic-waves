@@ -28,6 +28,7 @@ export default class Manager
     {
         // On récupère les instances depuis World
         const helmet = this.world.helmet
+        const astronaut = this.world.astronaut
         const eye = this.world.eye
         const beam = this.world.beam
 
@@ -37,7 +38,8 @@ export default class Manager
         switch(sceneNumber)
         {
             case 1:
-                helmet.show()
+                if(astronaut) astronaut.show()
+                if(helmet) helmet.show()
                 eye.hide()
                 beam.setMode(1)
                 // Vue de face
@@ -45,7 +47,8 @@ export default class Manager
                 break
 
             case 2:
-                helmet.show()
+                if(astronaut) astronaut.show()
+                if(helmet) helmet.show()
                 eye.hide()
                 beam.setMode(2)
                 // Vue de 3/4 (on décale X et Z)
@@ -53,7 +56,8 @@ export default class Manager
                 break
 
             case 3:
-                helmet.hide()
+                if(astronaut) astronaut.hide()
+                if(helmet) helmet.hide()
                 eye.show()
                 beam.setMode(3)
                 // Vue rapprochée pour l'oeil

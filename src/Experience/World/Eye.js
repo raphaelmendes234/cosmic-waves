@@ -14,8 +14,13 @@ export default class Eye
         this.renderer = this.experience.renderer
 
         // Setup
-        this.visiereMesh
         this.ressource = this.ressources.items.anatomicalEyeball
+
+        this.materialParams = {
+            envMapIntensity: 4.0,
+            roughness: 0.1,
+            metalness: 0.75,
+        }
 
         this.setCubeCamera()
         this.setModel()
@@ -37,19 +42,15 @@ export default class Eye
             {
                 child.castShadow = true
 
-                // if(child.name === 'NomDeLaVisiere') 
-                    this.visiereMesh = child;
+                this.visiereMesh = child;
     
-                    const mat = child.material;
-                    mat.envMap = this.cubeRenderTarget.texture;
+                const mat = child.material;
+                mat.envMap = this.cubeRenderTarget.texture;
+                mat.envMapIntensity = this.materialParams.envMapIntensity
+                mat.roughness = this.materialParams.roughness
+                mat.metalness = this.materialParams.metalness
     
-                    mat.envMapIntensity = 0.5
-    
-                    mat.roughness = 1.0
-                    mat.metalness = 0.9
-    
-                    mat.needsUpdate = true;
-                // {
+                mat.needsUpdate = true;
         }
         })
     }
@@ -71,9 +72,32 @@ export default class Eye
     {
         this.debugFolder = this.debug.gui.addFolder("eye")
 
-        this.debugFolder.add(this.visiereMesh.material, "envMapIntensity").min(0).max(1).step(0.01).onChange(() => { this.visiereMesh.material.needsUpdate = true })
-        this.debugFolder.add(this.visiereMesh.material, "roughness").min(0).max(1).step(0.01).onChange(() => { this.visiereMesh.material.needsUpdate = true })
-        this.debugFolder.add(this.visiereMesh.material, "metalness").min(0).max(1).step(0.01).onChange(() => { this.visiereMesh.material.needsUpdate = true })
+        this.debugFolder.add(this.materialParams, "envMapIntensity").min(0).max(5).step(0.01).onChange((value) => {
+                this.model.traverse((child) => {
+                    if (child instanceof THREE.Mesh) {
+                        child.material.envMapIntensity = value
+                        child.material.needsUpdate = true
+                    }
+                })
+            })
+
+        this.debugFolder.add(this.materialParams, "roughness").min(0).max(1).step(0.01).onChange((value) => {
+                this.model.traverse((child) => {
+                    if (child instanceof THREE.Mesh) {
+                        child.material.roughness = value
+                        child.material.needsUpdate = true
+                    }
+                })
+            })
+
+        this.debugFolder.add(this.materialParams, "metalness").min(0).max(1).step(0.01).onChange((value) => {
+                this.model.traverse((child) => {
+                    if (child instanceof THREE.Mesh) {
+                        child.material.metalness = value
+                        child.material.needsUpdate = true
+                    }
+                })
+            })
     }
 
     show()
@@ -89,10 +113,10 @@ export default class Eye
     update()
     {
         if (this.model && this.model.visible) {
-            this.cubeCamera.position.copy(this.visiereMesh.position)
-            this.visiereMesh.visible = false
+            this.cubeCamera.position.copy(this.model.position)
+            this.model.visible = false
             this.cubeCamera.update(this.renderer.instance, this.scene)
-            this.visiereMesh.visible = true
+            this.model.visible = true
         }
     }
 }

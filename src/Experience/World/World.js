@@ -1,4 +1,5 @@
 import Experience from '../Experience'
+import Astronaut from './Astronaut'
 import Beam from './Beam'
 import Environment from './Environment'
 import Eye from './Eye'
@@ -20,9 +21,10 @@ export default class World
         this.ressources.on('loaded', () => 
         {
             // Setup
-            this.helmet = new Helmet()
+            // this.helmet = new Helmet()
             this.beam = new Beam()
             this.eye = new Eye()
+            this.astronaut = new Astronaut()
             this.lights = new Lights()
 
             this.manager = new Manager()
@@ -43,6 +45,10 @@ export default class World
 
         if (this.eye) {
             this.eye.update()
+        }
+
+        if (this.astronaut) {
+            this.astronaut.update()
         }
 
         if (this.beam) {

@@ -36,4 +36,9 @@ export default [
         type: 'gltfModel',
         path: 'models/AnatomicalEyeball/scene.gltf'
     },
+    {
+        name: 'astronautModel',
+        type: 'gltfModel',
+        path: 'models/Astronaut/Astronaut.glb'
+    },
 ]
