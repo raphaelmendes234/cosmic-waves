@@ -7,6 +7,7 @@ import Renderer from './Renderer.js'
 import World from './World/World.js'
 import Debug from './Utils/Debug.js'
 import Ressources from './Utils/Ressources.js'
+import PostProcessing from './PostProcessing.js'
 
 import sources from './sources.js'
 
@@ -38,6 +39,7 @@ export default class Experience
         this.camera = new Camera()
         this.renderer = new Renderer()
         this.world = new World()
+        this.postProcessing = new PostProcessing()
 
         // Sizes resize event
         this.sizes.on('resize', () => {
@@ -60,7 +62,12 @@ export default class Experience
     {
         this.camera.update()
         this.world.update()
-        this.renderer.update()
+
+        if (this.postProcessing) {
+            this.postProcessing.update()
+        } else {
+            this.renderer.update()
+        }
     }
 
     destroy()
