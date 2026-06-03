@@ -20,10 +20,12 @@ export default class PostProcessing
         this.experience = new Experience()
         this.sizes = this.experience.sizes
         this.scene = this.experience.scene
-        this.time = this.experience.time
         this.camera = this.experience.camera.instance
         this.renderer = this.experience.renderer.instance
         this.debug = this.experience.debug
+        this.sound = this.experience.sound
+
+        this.aberrationStrength = 0.05
 
         // Set up
         this.setRenderTarget()
@@ -78,11 +80,12 @@ export default class PostProcessing
     }
 
     setDisplacementPass() {
-        const RetroTvPass = {
+        const CRTPass = {
             uniforms: {
                 tDiffuse: { value: null },
                 uCurvature: { value: 4.2 },
-                uBorder: { value: 0.05 }
+                uBorder: { value: 0.05 },
+                uAberration: { value: 0.0 }
             },
             vertexShader: `
                 varying vec2 vUv;
@@ -96,6 +99,7 @@ export default class PostProcessing
                 uniform sampler2D tDiffuse;
                 uniform float uCurvature;
                 uniform float uBorder;
+                uniform float uAberration;
                 varying vec2 vUv;
 
                 vec2 curve(vec2 uv){
@@ -108,7 +112,12 @@ export default class PostProcessing
                 void main(){
                     vec2 uv = curve(vUv);
 
-                    vec4 color = texture2D(tDiffuse, uv);
+                    // aberration chromatique radiale (plus forte vers les bords)
+                    vec2 ca = (uv - 0.5) * uAberration;
+                    float r = texture2D(tDiffuse, uv - ca).r;
+                    float g = texture2D(tDiffuse, uv).g;
+                    float b = texture2D(tDiffuse, uv + ca).b;
+                    vec4 color = vec4(r, g, b, 1.0);
 
                     // cadre noir arrondi (noircit aussi tout ce qui sort de l'écran courbé)
                     vec2 edge = smoothstep(0.0, uBorder, uv) * (1.0 - smoothstep(1.0 - uBorder, 1.0, uv));
@@ -119,14 +128,15 @@ export default class PostProcessing
             `,
         }
 
-        this.retroTvPass = new ShaderPass(RetroTvPass)
-        this.retroTvPass.enabled = true
-        this.effectComposer.addPass(this.retroTvPass)
+        this.crtPass = new ShaderPass(CRTPass)
+        this.crtPass.enabled = true
+        this.effectComposer.addPass(this.crtPass)
 
         if (this.debug.active) {
             const f = this.debug.gui.addFolder("CRT")
-            f.add(this.retroTvPass.material.uniforms.uCurvature, "value").min(2.5).max(10).step(0.1).name("courbure")
-            f.add(this.retroTvPass.material.uniforms.uBorder, "value").min(0).max(0.3).step(0.005).name("bordure")
+            f.add(this.crtPass.material.uniforms.uCurvature, "value").min(2.5).max(10).step(0.1).name("courbure")
+            f.add(this.crtPass.material.uniforms.uBorder, "value").min(0).max(0.3).step(0.005).name("bordure")
+            f.add(this, "aberrationStrength").min(0).max(0.1).step(0.001).name("aberration")
         }
     }
 
@@ -150,7 +160,7 @@ export default class PostProcessing
     }
 
     update() {
-        const elapsedTime = this.time.elapsed
+        this.crtPass.material.uniforms.uAberration.value = this.sound.kickHard * this.aberrationStrength
 
         this.effectComposer.render()
     }
