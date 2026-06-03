@@ -28,6 +28,16 @@ export default class PostProcessing
 
         this.aberrationStrength = 0.05
 
+        this.transition = 1             // 1 = écran fermé (on démarre coupé pendant le chargement)
+        this.phase = 'closed'           // état courant de l'animation
+        this.t = 0                      // durée d'une coupure complète, en secondes
+        this.transitionDuration = 0.2   // durée d'une coupure complète (s)
+        this.onPeak = null              // callback à exécuter quand l'écran est fermé (pour switcher)
+        this.peakFired = false          // évite d'appeler onPeak plusieurs fois
+
+        // ouvre l'écran quand les assets sont chargés
+        this.experience.ressources.on('loaded', () => { this.phase = 'opening'; this.t = 0 })
+
         // Set up
         this.setRenderTarget()
         this.setEffectComposer()
@@ -80,6 +90,15 @@ export default class PostProcessing
         }
     }
 
+    triggerTransition(onPeak)
+    {
+        // Lance une coupure complète : se ferme puis se rouvre
+        this.phase = 'pulsing'
+        this.t = 0
+        this.onPeak = onPeak       // appelé au moment fermé (pour switcher le plan)
+        this.peakFired = false
+    }
+
     setCRTPass() {
         const CRTPass = {
             uniforms: {
@@ -88,7 +107,8 @@ export default class PostProcessing
                 uBorder: { value: 0.05 },
                 uAberration: { value: 0.05 },
                 uGrain: { value: 0.0 },
-                uTime: { value: 0 } 
+                uTime: { value: 0 },
+                uTransition: { value: 1 }
             },
             vertexShader: `
                 varying vec2 vUv;
@@ -105,6 +125,7 @@ export default class PostProcessing
                 uniform float uAberration;
                 uniform float uGrain;
                 uniform float uTime;
+                uniform float uTransition;
                 varying vec2 vUv;
 
                 float rand(vec2 co){
@@ -127,18 +148,33 @@ export default class PostProcessing
                 void main(){
                     vec2 uv = curve(vUv);
 
-                    // aberration chromatique radiale (plus forte vers les bords)
-                    vec2 ca = (uv - 0.5) * uAberration;
-                    float r = texture2D(tDiffuse, uv - ca).r;
-                    float g = texture2D(tDiffuse, uv).g;
-                    float b = texture2D(tDiffuse, uv + ca).b;
+                    // --- Coupure CRT : on comprime l'image dans une bande horizontale ---
+                    // openY = hauteur visible de l'écran (1 = ouvert, 0 = fermé en ligne)
+                    float openY = 1.0 - uTransition;
+                    // on "étire" la bande visible vers la coordonnée réelle de la texture :
+                    // quand openY est petit, seul le centre (y~0.5) tombe dans [0,1]
+                    float y = (uv.y - 0.5) / max(openY, 0.0001) + 0.5;
+                    vec2 tuv = vec2(uv.x, y);
+
+                    // Aberration chromatique : on échantillonne R et B décalés vers les bords
+                    vec2 ca = (tuv - 0.5) * uAberration;
+                    float r = texture2D(tDiffuse, tuv - ca).r;
+                    float g = texture2D(tDiffuse, tuv).g;
+                    float b = texture2D(tDiffuse, tuv + ca).b;
                     vec4 color = vec4(r, g, b, 1.0);
 
-                    // grain / static (animé, en espace écran)
+                    // Grain : bruit blanc par pixel, animé par uTime
                     float noise = hash12(gl_FragCoord.xy + fract(uTime) * 100.0);
                     color.rgb += (noise - 0.5) * uGrain;
 
-                    // cadre noir arrondi (noircit aussi tout ce qui sort de l'écran courbé)
+                    // Tout ce qui sort de la bande visible passe en noir
+                    if (y < 0.0 || y > 1.0) color.rgb = vec3(0.0);
+
+                    // Glow : une ligne lumineuse au centre, d'autant plus forte que l'écran est fermé
+                    float glow = smoothstep(openY * 0.5, 0.0, abs(uv.y - 0.5));
+                    color.rgb += glow * uTransition * 0.4;
+
+                    // Cadre noir arrondi de la télé
                     vec2 edge = smoothstep(0.0, uBorder, uv) * (1.0 - smoothstep(1.0 - uBorder, 1.0, uv));
                     color.rgb *= edge.x * edge.y;
 
@@ -180,6 +216,26 @@ export default class PostProcessing
     }
 
     update() {
+        const dt = this.time.delta * 0.001
+
+        if (this.phase === 'closed') {
+            this.transition = 1                                 // reste fermé tant que ça charge
+        } else if (this.phase === 'opening') {                  // chargement terminé : ouverture 1 → 0
+            this.t += dt / this.transitionDuration
+            this.transition = 1 - Math.min(this.t, 1)
+            if (this.t >= 1) this.phase = 'idle'
+        } else if (this.phase === 'pulsing') {                  // changement de plan : ferme (0→1) puis ouvre (1→0)
+            this.t += dt / this.transitionDuration
+            const x = Math.min(this.t, 1)
+            this.transition = 1 - Math.abs(x * 2 - 1)           // courbe triangle : pic à mi-parcours
+            // à mi-chemin (écran fermé), on déclenche le switch une seule fois
+            if (!this.peakFired && x >= 0.5) { this.peakFired = true; if (this.onPeak) this.onPeak() }
+            if (this.t >= 1) this.phase = 'idle'
+        } else {
+            this.transition = 0                                 // idle : écran normal
+        }
+
+        this.crtPass.material.uniforms.uTransition.value = this.transition
         this.crtPass.material.uniforms.uAberration.value = this.sound.kickHard * this.aberrationStrength
         this.crtPass.material.uniforms.uTime.value = this.time.elapsed * 0.001
 

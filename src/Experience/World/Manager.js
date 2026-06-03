@@ -11,6 +11,7 @@ export default class Manager
         this.debug = this.experience.debug
         this.sound = this.experience.sound
         this.time = this.experience.time
+        this.postProcessing = this.experience.postProcessing
 
         this.currentScene = 1
 
@@ -26,13 +27,23 @@ export default class Manager
             this.debugFolder = this.debug.gui.addFolder('MANAGER')
             this.sceneController = this.debugFolder.add(this, 'currentScene', { 'scene 1': 1, 'scene 2': 2, 'scene 3': 3 })
                 .name('Change scene')
-                .onChange(() => { this.switchScene(parseInt(this.currentScene)) })
+                .onChange(() => { this.goToScene(parseInt(this.currentScene)) })
 
             this.debugFolder.add(this, 'auto').name('auto switch')
             this.debugFolder.add(this, 'minDuration').min(1).max(20).step(1).name('durée mini (fort)')
             this.debugFolder.add(this, 'maxDuration').min(1).max(30).step(1).name('durée maxi (faible)')
             this.debugFolder.add(this, 'volumeBoost').min(1).max(10).step(0.1).name('sensibilité volume')
         }
+    }
+
+    // helper qui switche au creux de la coupure (écran fermé = cut masqué) 
+    goToScene(n)
+    {
+        this.currentScene = n
+        this.postProcessing.triggerTransition(() => {
+            this.switchScene(n)                                             // exécuté écran fermé
+            if (this.sceneController) this.sceneController.updateDisplay()  // le GUI suit
+        })
     }
 
     switchScene(sceneNumber)
@@ -98,11 +109,9 @@ export default class Manager
 
         this.autoTimer += this.time.delta * 0.001   // secondes
 
-        if (this.autoTimer >= targetDuration && s.kickHard > 0.5) {
-            const next = (this.currentScene % this.sceneCount) + 1  // 1→2→3→1
-            this.currentScene = next
-            this.switchScene(next)
-            if (this.sceneController) this.sceneController.updateDisplay()  // update gui
+        if (this.autoTimer >= targetDuration && this.sound.kickHard > 0.5) {
+            const next = (this.currentScene % this.sceneCount) + 1
+            this.goToScene(next)
             this.autoTimer = 0
         }
     } 
