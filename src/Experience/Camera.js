@@ -12,6 +12,10 @@ export default class Camera
         this.scene = this.experience.scene
         this.canvas = this.experience.canvas
         this.debug = this.experience.debug
+        this.sound = this.experience.sound
+
+        this.baseFov = 35 // fov de base
+        this.fovAmount = 60  
 
         this.setInstance()
         this.setOrbitControls()
@@ -72,6 +76,7 @@ export default class Camera
         targetFolder.add(this.controls.target, 'x').min(-10).max(10).step(0.05).name('target x').listen()
         targetFolder.add(this.controls.target, 'y').min(-10).max(10).step(0.05).name('target y').listen()
         targetFolder.add(this.controls.target, 'z').min(-10).max(10).step(0.05).name('target z').listen()
+
     }
 
     cutToShot(position, target)
@@ -84,5 +89,9 @@ export default class Camera
     update()
     {
         this.controls.update()
+
+        const s = this.sound
+        this.instance.fov = this.baseFov + Math.pow(s.volumeAverageSmooth, 2.0) * this.fovAmount
+        this.instance.updateProjectionMatrix()
     }
 }

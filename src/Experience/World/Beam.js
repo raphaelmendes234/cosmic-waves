@@ -294,7 +294,7 @@ export default class Beam
         } 
         else if (this.mode === 2) {
             // group rota
-            this.group.rotation.set(Math.PI * 0.05, Math.PI, 0)
+            this.group.rotation.set(Math.PI * 0.05, Math.PI + 0.5 , 0)
 
             // beams params
             this.p.startDiameter = 10.0
