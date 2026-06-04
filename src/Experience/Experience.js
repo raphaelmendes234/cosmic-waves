@@ -71,6 +71,8 @@ export default class Experience
         } else {
             this.renderer.update()
         }
+
+        this.debug.update()
     }
 
     destroy()
