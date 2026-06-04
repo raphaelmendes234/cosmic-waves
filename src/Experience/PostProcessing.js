@@ -189,6 +189,7 @@ export default class PostProcessing
 
         if (this.debug.active) {
             const f = this.debug.gui.addFolder("CRT")
+            f.close()
             f.add(this.crtPass.material.uniforms.uCurvature, "value").min(2.5).max(10).step(0.1).name("courbure")
             f.add(this.crtPass.material.uniforms.uBorder, "value").min(0).max(0.3).step(0.005).name("bordure")
             f.add(this, "aberrationStrength").min(0).max(0.1).step(0.001).name("aberration")

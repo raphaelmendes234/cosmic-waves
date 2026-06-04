@@ -17,8 +17,8 @@ export default class Manager
 
         this.sceneCount = 3
         this.auto = true          // changement automatique activé
-        this.minDuration = 2     // durée quand le son est FORT (cuts rapides)
-        this.maxDuration = 10    // durée quand le son est FAIBLE (cuts lents)
+        this.minDuration = 6     // durée quand le son est FORT (cuts rapides)
+        this.maxDuration = 12    // durée quand le son est FAIBLE (cuts lents)
         this.volumeBoost = 3     // amplifie le volume (car volumeAverageSmooth reste bas)
         this.autoTimer = 0
 

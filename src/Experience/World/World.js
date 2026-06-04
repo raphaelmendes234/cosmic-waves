@@ -9,6 +9,7 @@ import Helmet from './Helmet'
 import Lights from './Lights'
 import Manager from './Manager'
 import Stars from './Stars'
+import SpaceSky from './SpaceSky'
 
 export default class World
 {
@@ -27,6 +28,7 @@ export default class World
             this.eye = new Eye()
             this.astronaut = new Astronaut()
             this.lights = new Lights()
+            this.spaceSky = new SpaceSky()
 
             this.manager = new Manager()
             this.manager.switchScene(1)
@@ -58,6 +60,10 @@ export default class World
 
         if (this.stars) {
             this.stars.update()
+        }
+
+        if (this.spaceSky) {
+            this.spaceSky.update()
         }
 
         if (this.manager) {
