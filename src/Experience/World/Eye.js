@@ -28,12 +28,16 @@ export default class Eye
         if (this.debug.active) {
             this.setDebug()
         }
+
+        this.setAnimation()
     }
 
     setModel()
     {
         this.model = this.ressource.scene
-        this.model.scale.set(0.01, 0.01, 0.01)
+        this.model.position.set(-1.2, -2.5 , 3.5)
+        this.model.rotation.set(0, Math.PI * 0.25 , 0)
+        this.model.scale.set(0.3, 0.3, 0.3)
         this.scene.add(this.model)
 
         this.model.traverse((child) => 
@@ -66,6 +70,19 @@ export default class Eye
         // Créer la CubeCamera (near, far, renderTarget)
         this.cubeCamera = new THREE.CubeCamera(0.1, 1000, this.cubeRenderTarget)
         this.scene.add(this.cubeCamera)
+    }
+
+    setAnimation()
+    {
+        this.animation = {}
+        this.animation.mixer = new THREE.AnimationMixer(this.model)
+
+        this.animation.actions = {}
+        
+        this.animation.actions.idle = this.animation.mixer.clipAction(this.ressource.animations[0])
+
+        this.animation.actions.current = this.animation.actions.idle
+        this.animation.actions.current.play()
     }
 
     setDebug()
@@ -118,6 +135,8 @@ export default class Eye
             this.model.visible = false
             this.cubeCamera.update(this.renderer.instance, this.scene)
             this.model.visible = true
+
+            this.animation.mixer.update(this.time.delta * 0.001)
         }
     }
 }

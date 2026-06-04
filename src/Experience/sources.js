@@ -34,11 +34,11 @@ export default [
     {
         name: 'anatomicalEyeball',
         type: 'gltfModel',
-        path: 'models/AnatomicalEyeball/scene.gltf'
+        path: 'models/Eye/eyeDRACO.glb'
     },
     {
         name: 'astronautModel',
         type: 'gltfModel',
-        path: 'models/Astronaut/Astronaut.glb'
+        path: 'models/Astronaut/AstronautDRACO.glb'
     },
 ]
