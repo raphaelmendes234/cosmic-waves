@@ -16,7 +16,7 @@ let instance = null
 
 export default class Experience 
 {
-    constructor(canvas)
+    constructor(canvas, audio)
     {
         if(instance)
         {
@@ -36,7 +36,7 @@ export default class Experience
         this.sizes = new Sizes()
         this.time = new Time()
         this.scene = new THREE.Scene()
-        this.sound = new Sound()      
+        this.sound = new Sound(audio)      
         this.ressources = new Ressources(sources)
         this.camera = new Camera()
         this.renderer = new Renderer()
@@ -54,6 +54,19 @@ export default class Experience
         })
     }
 
+    ready()
+    {
+        return new Promise((resolve) => this.ressources.on('loaded', resolve))
+    }
+
+    warmup() { this.render() }
+    play()
+    { 
+        this.active = true 
+        if (this.world && this.world.manager) this.world.manager.reset()
+    }
+    stop()   { this.active = false }
+
     resize()
     {
         this.camera.resize()
@@ -63,16 +76,17 @@ export default class Experience
 
     update()
     {
+        if (!this.active) return
+        this.render()
+    }
+
+    render()
+    {
         this.camera.update()
         this.world.update()
-
-        if (this.postProcessing) {
-            this.postProcessing.update()
-        } else {
-            this.renderer.update()
-        }
-
         this.debug.update()
+        if (this.postProcessing) this.postProcessing.update()
+        else this.renderer.update()
     }
 
     destroy()
