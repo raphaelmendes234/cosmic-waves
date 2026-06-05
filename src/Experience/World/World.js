@@ -1,15 +1,11 @@
-import Experience from '../Experience'
-import Astronaut from './Astronaut'
-import Beam from './Beam'
-import Environment from './Environment'
-import Eye from './Eye'
-import Floor from './Floor'
-import Fox from './Fox'
-import Helmet from './Helmet'
-import Lights from './Lights'
-import Manager from './Manager'
-import Stars from './Stars'
-import SpaceSky from './SpaceSky'
+import Experience from '../Experience.js'
+import Astronaut from './Astronaut.js'
+import Beam from './Beam.js'
+import Eye from './Eye.js'
+import Lights from './Lights.js'
+import Manager from './Manager.js'
+import Stars from './Stars.js'
+import SpaceSky from './SpaceSky.js'
 
 export default class World
 {
@@ -38,14 +34,6 @@ export default class World
 
     update()
     {
-        if(this.fox){
-            this.fox.update()
-        }
-
-        if (this.helmet) {
-            this.helmet.update()
-        }
-
         if (this.eye) {
             this.eye.update()
         }
