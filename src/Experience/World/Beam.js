@@ -29,6 +29,9 @@ export default class Beam
     {
         this.group = new THREE.Group()
         this.scene.add(this.group)
+
+        this.spinner = new THREE.Group()   // spins around the tube axis (swirl)
+        this.group.add(this.spinner)
     }
 
     setParameters()
@@ -66,6 +69,8 @@ export default class Beam
         }
         this.p.activeColorMode = 'nebula'
         this.p.colorProgress = 1.0
+
+        this.p.swirlSpeed = 0.3   // swirl rotation speed (rad/s)
 
         /**
          * Audio
@@ -277,7 +282,7 @@ export default class Beam
         this.mesh = new THREE.InstancedMesh( this.geometry, this.material, this.p.maxCount )
         this.mesh.count = this.p.count
         this.mesh.frustumCulled = false 
-        this.group.add(this.mesh)
+        this.spinner.add(this.mesh)
     }
 
     setMode(modeNumber)
@@ -397,6 +402,9 @@ export default class Beam
         // Colors
         const colorFolder = this.debugFolder.addFolder("colors").close()
         colorFolder.add(this.p, 'activeColorMode', this.paletteNames).name('color ambiance').onChange((newMode) => { this.changeColorMode(newMode) })
+
+        const swirlFolder = this.debugFolder.addFolder("swirl").close()
+        swirlFolder.add(this.p, "swirlSpeed").min(-3).max(3).step(0.01).name("swirl speed")
     }
 
     refreshGuiDisplay(folder)
@@ -460,5 +468,8 @@ export default class Beam
             }
             this.material.uniforms.uColorProgress.value = this.p.colorProgress
         }
+
+        // Swirl rotation
+        this.spinner.rotation.z += this.p.swirlSpeed * deltaTime * 0.001
     }
 }
