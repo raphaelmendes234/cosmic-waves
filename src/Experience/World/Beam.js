@@ -294,8 +294,9 @@ export default class Beam
             this.group.rotation.set(0, Math.PI, 0)
 
             this.p.startDiameter = 30.0
-            this.p.endDiameter = 0.1
+            this.p.endDiameter = 6.7
             this.p.curvature = -4.0
+            this.p.noiseStrength = 0.3
         } 
         else if (this.mode === 2) {
             this.group.rotation.set(Math.PI * 0.05, Math.PI + 0.5 , 0)
@@ -303,6 +304,7 @@ export default class Beam
             this.p.startDiameter = 10.0
             this.p.endDiameter = 30.0
             this.p.curvature = -4.0
+            this.p.noiseStrength = 0.3
         } 
         else if (this.mode === 3) {
             this.group.rotation.set(-Math.PI * 0.5, 0, 0)
@@ -310,6 +312,15 @@ export default class Beam
             this.p.startDiameter = 20.0
             this.p.endDiameter = 20.0
             this.p.curvature = 0.0
+            this.p.noiseStrength = 0.3
+        }
+        else if (this.mode === 4) {
+            this.group.rotation.set(0, Math.PI * 2, 0)
+
+            this.p.startDiameter = 0.1
+            this.p.endDiameter = 30.0
+            this.p.curvature = -1.9
+            this.p.noiseStrength = 0.0
         }
 
         // Refresh debug
@@ -317,6 +328,16 @@ export default class Beam
         {
             this.refreshGuiDisplay(this.debugFolder)
         }
+    }
+
+    show()
+    {
+        if(this.group) this.group.visible = true
+    }
+
+    hide()
+    {
+        if(this.group) this.group.visible = false
     }
     
     changeColorMode(modeName)

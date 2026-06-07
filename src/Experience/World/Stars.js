@@ -202,6 +202,20 @@ export default class Stars
             this.group.rotation.set(-Math.PI * 0.5, 0, 0)
             this.p.size = 3
         }
+        else if (this.mode === 4) {
+            this.group.rotation.set(0, Math.PI * 2, 0)
+            this.p.size = 3
+        }
+    }
+
+    show()
+    {
+        if(this.group) this.group.visible = true
+    }
+
+    hide()
+    {
+        if(this.group) this.group.visible = false
     }
     
     changeColorMode(modeName)

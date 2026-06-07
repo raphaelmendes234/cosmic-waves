@@ -146,23 +146,31 @@ export default class Astronaut
 
     setMode(modeNumber)
     {
-        if (!this.model && !this.model.visible) return
+        if (!this.model || !this.model.visible) return
         
         this.mode = modeNumber
 
         if (this.mode === 1) {
             this.model.scale.set(1.5,1.5,1.5)
             this.model.position.set(-0.25, -4.5, 4)
+            this.model.rotation.set(0, 0, 0)
             this.animation.play('floating')
         } 
         else if (this.mode === 2) {
             this.model.scale.set(3,3,3)
             this.model.position.set(-1, -7.5, 1)
+            this.model.rotation.set(0, 0, 0)
             this.animation.play('idle')
         } 
         else if (this.mode === 3) {
            console.log("astronaut on scene 3")
         }
+        else if (this.mode === 4) {
+            this.model.scale.set(3,3,3)
+            this.model.position.set(2, -5, -3)
+            this.model.rotation.set(Math.PI * 0.3, -Math.PI * 0.8, 0)
+            this.animation.play('idle')
+        } 
     }
 
     show()

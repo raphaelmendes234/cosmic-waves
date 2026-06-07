@@ -15,7 +15,7 @@ export default class Manager
 
         this.currentScene = 1
 
-        this.sceneCount = 3
+        this.sceneCount = 4
         this.auto = true         // Auto switching enabled
         this.minDuration = 6     // Duration when loud (fast cuts)
         this.maxDuration = 12    // Duration when quiet (slow cuts)
@@ -25,7 +25,7 @@ export default class Manager
         if(this.debug.active)
         {
             this.debugFolder = this.debug.gui.addFolder('MANAGER')
-            this.sceneController = this.debugFolder.add(this, 'currentScene', { 'scene 1': 1, 'scene 2': 2, 'scene 3': 3 })
+            this.sceneController = this.debugFolder.add(this, 'currentScene', { 'scene 1': 1, 'scene 2': 2, 'scene 3': 3, 'scene 4': 4 })
                 .name('Change scene')
                 .onChange(() => { this.goToScene(parseInt(this.currentScene)) })
 
@@ -60,33 +60,38 @@ export default class Manager
         switch(sceneNumber)
         {
             case 1:
-                if(astronaut) { 
-                    astronaut.show() 
-                    astronaut.setMode(1)
-                }
-                if(eye) eye.hide()
-                if(beam) beam.setMode(1)
-                if(stars) stars.setMode(1)
+                astronaut?.show() 
+                astronaut?.setMode(1)
+                eye?.hide()
+                beam?.setMode(1)
+                stars?.setMode(1)
                 this.camera.cutToShot(new THREE.Vector3(0, 0, 16), centerTarget)
                 break
 
             case 2:
-                if(astronaut) {
-                    astronaut.show() 
-                    astronaut.setMode(2)
-                }
-                if(eye) eye.hide()
-                if(beam) beam.setMode(2)
-                if(stars) stars.setMode(2)
+                astronaut?.show() 
+                astronaut?.setMode(2)
+                eye?.hide()
+                beam?.setMode(2)
+                stars?.setMode(2)
                 this.camera.cutToShot(new THREE.Vector3(-3.5, 0.6, 4.3), new THREE.Vector3(5.8, -0.7, -2))
                 break
 
             case 3:
-                if(astronaut) astronaut.hide()
-                if(eye) eye.show()
-                if(beam) beam.setMode(3)
-                if(stars) stars.setMode(3)
+                astronaut?.hide()
+                eye?.show()
+                beam?.setMode(3)
+                stars?.setMode(3)
                 this.camera.cutToShot(new THREE.Vector3(0, 0, 8), centerTarget)
+                break
+            
+            case 4:
+                astronaut?.show() 
+                astronaut?.setMode(4)
+                eye?.hide()
+                beam?.setMode(4)
+                stars?.setMode(4)
+                this.camera.cutToShot(new THREE.Vector3(-2.8, 0.6, 7), new THREE.Vector3(1.1, -0.5, 0.2))
                 break
         }
     }
